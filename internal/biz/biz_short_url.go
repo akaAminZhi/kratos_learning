@@ -51,7 +51,8 @@ func (uc *ShortUrlUsecase) CreateShortUrl(ctx context.Context, s *model.ShortUrl
 	}
 
 	// 2.generate md5
-	lurl := strings.TrimRight((*s.Lurl), `\`)
+	lurl := strings.TrimRight((*s.Lurl), `/`)
+
 	s.Lurl = &lurl
 	md5 := md5.GetMd5([]byte(*(s.Lurl)))
 	// 2.1 search md5 from db, check if exist
@@ -64,7 +65,7 @@ func (uc *ShortUrlUsecase) CreateShortUrl(ctx context.Context, s *model.ShortUrl
 	// get url from mysql
 	seq, _ := uc.repo.GetShortNum(ctx)
 	surl := base62.Base10ToBase62(seq)
-	s.Surl = "QZM.com/" + surl
+	s.Surl = surl
 	// fmt.Println("surl:", surl)
 	return uc.repo.Save(ctx, s)
 }

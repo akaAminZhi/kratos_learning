@@ -22,11 +22,12 @@ func (s *ShortUrlService) CreateShortUrl(ctx context.Context, req *pb.CreateShor
 	shortUrlMap := model.ShortUrlMap{
 		Lurl: &req.LongUrl,
 	}
+
 	err := s.uc.CreateShortUrl(ctx, &shortUrlMap)
 	if err != nil {
 		return nil, err
 	}
-	return &pb.CreateShortUrlReply{}, nil
+	return &pb.CreateShortUrlReply{ShortUrl: shortUrlMap.Surl}, nil
 }
 func (s *ShortUrlService) UpdateShortUrl(ctx context.Context, req *pb.UpdateShortUrlRequest) (*pb.UpdateShortUrlReply, error) {
 

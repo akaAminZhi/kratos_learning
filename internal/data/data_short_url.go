@@ -39,7 +39,7 @@ func (s *shortRepo) Update(ctx context.Context, model *model.ShortUrlMap) error 
 
 func (s *shortRepo) Get(ctx context.Context, model *model.ShortUrlMap) error {
 
-	return s.data.mysqlDb.First(model).Error
+	return s.data.mysqlDb.Where("md5 = ?", model.Md5).First(model).Error
 }
 
 func (s *shortRepo) GetShortNum(context.Context) (uint64, error) {
