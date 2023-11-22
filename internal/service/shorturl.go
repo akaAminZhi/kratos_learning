@@ -27,7 +27,8 @@ func (s *ShortUrlService) CreateShortUrl(ctx context.Context, req *pb.CreateShor
 	if err != nil {
 		return nil, err
 	}
-	return &pb.CreateShortUrlReply{ShortUrl: shortUrlMap.Surl}, nil
+	surl := "akaQZM.com/" + shortUrlMap.Surl
+	return &pb.CreateShortUrlReply{ShortUrl: surl}, nil
 }
 func (s *ShortUrlService) UpdateShortUrl(ctx context.Context, req *pb.UpdateShortUrlRequest) (*pb.UpdateShortUrlReply, error) {
 

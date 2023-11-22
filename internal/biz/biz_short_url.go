@@ -56,7 +56,9 @@ func (uc *ShortUrlUsecase) CreateShortUrl(ctx context.Context, s *model.ShortUrl
 	s.Lurl = &lurl
 	md5 := md5.GetMd5([]byte(*(s.Lurl)))
 	// 2.1 search md5 from db, check if exist
-	err := uc.repo.Get(ctx, &model.ShortUrlMap{Md5: md5})
+	temp := &model.ShortUrlMap{Md5: md5}
+	err := uc.repo.Get(ctx, temp)
+	// fmt.Println(temp)
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return errors.New("this url already convert")
 	}
