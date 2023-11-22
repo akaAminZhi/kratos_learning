@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package api.shortUrl.v1;
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "shortUrl/api/shortUrl/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.shortUrl.v1";
+
+service ShortUrl {
+	rpc CreateShortUrl (CreateShortUrlRequest) returns (CreateShortUrlReply){
+		option (google.api.http) = {
+			post: "/v1/shorturl",
+			body: "*"
+		  };
+	};
+	rpc UpdateShortUrl (UpdateShortUrlRequest) returns (UpdateShortUrlReply);
+	rpc DeleteShortUrl (DeleteShortUrlRequest) returns (DeleteShortUrlReply);
+	rpc GetUrl (GetUrlRequest) returns (GetUrlReply){
+		option (google.api.http) = {
+			get: "/v1/{shortUrl}",
+			
+		  };
+	};
+
+}
+
+message CreateShortUrlRequest {
+	string longUrl=1 [(validate.rules).string.min_len =  1];
+}
+message CreateShortUrlReply {
+	string shortUrl=1;
+}
+
+message UpdateShortUrlRequest {}
+message UpdateShortUrlReply {}
+
+message DeleteShortUrlRequest {}
+message DeleteShortUrlReply {}
+
+message GetUrlRequest {
+	string shortUrl=1 [(validate.rules).string.min_len =  1];
+}
+message GetUrlReply {
+	string longUrl=1;
+}
+

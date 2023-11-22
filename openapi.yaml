@@ -1,0 +1,90 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: ""
+    version: 0.0.1
+paths:
+    /helloworld/{name}:
+        get:
+            tags:
+                - Greeter
+            description: Sends a greeting
+            operationId: Greeter_SayHello
+            parameters:
+                - name: name
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/helloworld.v1.HelloReply'
+    /v1/shorturl:
+        post:
+            tags:
+                - ShortUrl
+            operationId: ShortUrl_CreateShortUrl
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.shortUrl.v1.CreateShortUrlRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.shortUrl.v1.CreateShortUrlReply'
+    /v1/{shortUrl}:
+        get:
+            tags:
+                - ShortUrl
+            operationId: ShortUrl_GetUrl
+            parameters:
+                - name: shortUrl
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.shortUrl.v1.GetUrlReply'
+components:
+    schemas:
+        api.shortUrl.v1.CreateShortUrlReply:
+            type: object
+            properties:
+                shortUrl:
+                    type: string
+        api.shortUrl.v1.CreateShortUrlRequest:
+            type: object
+            properties:
+                longUrl:
+                    type: string
+        api.shortUrl.v1.GetUrlReply:
+            type: object
+            properties:
+                longUrl:
+                    type: string
+        helloworld.v1.HelloReply:
+            type: object
+            properties:
+                message:
+                    type: string
+            description: The response message containing the greetings
+tags:
+    - name: Greeter
+      description: The greeting service definition.
+    - name: ShortUrl
