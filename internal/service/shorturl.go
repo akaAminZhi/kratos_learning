@@ -39,5 +39,13 @@ func (s *ShortUrlService) DeleteShortUrl(ctx context.Context, req *pb.DeleteShor
 }
 func (s *ShortUrlService) GetUrl(ctx context.Context, req *pb.GetUrlRequest) (*pb.GetUrlReply, error) {
 	fmt.Println(req.ShortUrl)
-	return &pb.GetUrlReply{}, nil
+	shortUrlMap := model.ShortUrlMap{
+		Surl: req.ShortUrl,
+	}
+	err := s.uc.ShowUrl(ctx, &shortUrlMap)
+	if err != nil {
+
+		return nil, err
+	}
+	return &pb.GetUrlReply{LongUrl: *shortUrlMap.Lurl}, nil
 }

@@ -27,6 +27,7 @@ type ShortRepo interface {
 	Get(context.Context, *model.ShortUrlMap) error
 	GetShortNum(context.Context) (uint64, error)
 	CheckSurlExist(context.Context, string) bool
+	GetLongUrl(context.Context, *model.ShortUrlMap) error
 }
 
 // GreeterUsecase is a Greeter usecase.
@@ -86,24 +87,14 @@ func (uc *ShortUrlUsecase) CreateShortUrl(ctx context.Context, s *model.ShortUrl
 }
 
 func (uc *ShortUrlUsecase) ShowUrl(ctx context.Context, s *model.ShortUrlMap) error {
-	// www.aaa.com/aed/123
-	// 1.get base url will return 123
 
-	// 2.generate md5
-	lurl := strings.TrimRight((*s.Lurl), `\`)
-	s.Lurl = &lurl
-	md5 := md5.GetMd5([]byte(*(s.Lurl)))
-	// 2.1 search md5 from db, check if exist
-	err := uc.repo.Get(ctx, &model.ShortUrlMap{Md5: md5})
-	if !errors.Is(err, gorm.ErrRecordNotFound) {
-		return errors.New("this url already convert")
+	// if not exist return error
+	if !uc.repo.CheckSurlExist(ctx, s.Surl) {
+		uc.log.Infof("the url:%v is not in the data", s.Surl)
+
+		return errors.New("this surl is not convert")
 	}
-	s.Md5 = md5
-
-	// get url from mysql
-	seq, _ := uc.repo.GetShortNum(ctx)
-	surl := base62.Base10ToBase62(seq)
-	s.Surl = surl
-	// fmt.Println("surl:", surl)
-	return uc.repo.Save(ctx, s)
+	// s.Surl = baseUrl
+	// 2. get Lurl from data
+	return uc.repo.GetLongUrl(ctx, s)
 }

@@ -7,6 +7,7 @@ import (
 	"shortUrl/third_party/bloom"
 
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/redis/go-redis/v9"
 )
 
 type shortRepo struct {
@@ -37,7 +38,6 @@ func (s *shortRepo) Save(ctx context.Context, model *model.ShortUrlMap) error {
 		return err
 	}
 	bloom.GetBloom().AddString(model.Surl)
-
 	return nil
 }
 
@@ -66,4 +66,22 @@ func (s *shortRepo) GetShortNum(context.Context) (uint64, error) {
 
 func (s *shortRepo) CheckSurlExist(ctx context.Context, data string) bool {
 	return bloom.GetBloom().Test([]byte(data))
+}
+
+func (s *shortRepo) GetLongUrl(ctx context.Context, model *model.ShortUrlMap) error {
+	// 1. get it from redis first
+	lurl, err := s.getRedisValue(ctx, model.Surl)
+	if err != nil {
+		if err == redis.Nil {
+			err = s.data.mysqlDb.Where("surl = ?", model.Surl).First(&model).Error
+			if err != nil {
+				return err
+			}
+			return nil
+		}
+		s.log.Infof("fall to get redis value\n")
+		return err
+	}
+	model.Lurl = &lurl
+	return nil
 }
