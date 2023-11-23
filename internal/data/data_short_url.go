@@ -4,6 +4,7 @@ import (
 	"context"
 	"shortUrl/internal/biz"
 	"shortUrl/internal/data/model"
+	"shortUrl/third_party/bloom"
 
 	"github.com/go-kratos/kratos/v2/log"
 )
@@ -25,11 +26,18 @@ func (s *shortRepo) Save(ctx context.Context, model *model.ShortUrlMap) error {
 	// s.data.mysqlDb.Exec("REPLACE INTO sequence (stub) VALUES ('a');")
 	// fmt.Println(model)
 	// s.data.mysqlDb.First(model.Sequence{})
-	err := s.data.mysqlDb.Create(&model).Error
+	err := s.setRedisKey(ctx, model.Surl, *(model.Lurl))
+	if err != nil {
+		s.log.Infof("create short url map fall to redis database\n")
+		return err
+	}
+	err = s.data.mysqlDb.Create(&model).Error
 	if err != nil {
 		s.log.Infof("create short url map fall to database\n")
 		return err
 	}
+	bloom.GetBloom().AddString(model.Surl)
+
 	return nil
 }
 
@@ -54,4 +62,8 @@ func (s *shortRepo) GetShortNum(context.Context) (uint64, error) {
 	s.data.mysqlDb.Raw("SELECT LAST_INSERT_ID();").Pluck("id", &id)
 
 	return id[0], nil
+}
+
+func (s *shortRepo) CheckSurlExist(ctx context.Context, data string) bool {
+	return bloom.GetBloom().Test([]byte(data))
 }

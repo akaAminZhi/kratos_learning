@@ -8,6 +8,7 @@ import "google/protobuf/duration.proto";
 message Bootstrap {
   Server server = 1;
   Data data = 2;
+  Filter filter = 3;
 }
 
 message Server {
@@ -38,4 +39,12 @@ message Data {
   }
   Database database = 1;
   Redis redis = 2;
+}
+
+message Filter{
+  message Bloom{
+    uint32 elementNumer = 1;
+    float errorRate = 2;
+  }
+  Bloom bloom = 1;
 }

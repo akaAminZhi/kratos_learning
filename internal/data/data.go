@@ -1,7 +1,6 @@
 package data
 
 import (
-	"context"
 	"fmt"
 	"shortUrl/internal/conf"
 
@@ -27,17 +26,7 @@ func NewData(c *conf.Data, logger log.Logger, db *gorm.DB, rdb *redis.Client) (*
 	cleanup := func() {
 		log.NewHelper(logger).Info("closing the data resources")
 	}
-	ctx := context.Background()
-	err := rdb.Set(ctx, "key", "value", 0).Err()
-	if err != nil {
-		panic(err)
-	}
 
-	val, err := rdb.Get(ctx, "key").Result()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("key", val)
 	return &Data{mysqlDb: db, rdb: rdb}, cleanup, nil
 }
 
@@ -51,12 +40,7 @@ func NewSequenceDataBase(c *conf.Data, logger log.Logger) *gorm.DB {
 		panic("init database fail")
 
 	}
-	// err = db.AutoMigrate(&model.ShortUrlMap{})
-	// if err != nil {
-	// 	log.NewHelper(logger).Infof("auto migrate mysql database err:%v\n", err)
-	// 	panic("auto migrate fail")
 
-	// }
 	return db
 
 }
@@ -69,13 +53,6 @@ func NewRedis(c *conf.Data, logger log.Logger) *redis.Client {
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
-
-	// err = db.AutoMigrate(&model.ShortUrlMap{})
-	// if err != nil {
-	// 	log.NewHelper(logger).Infof("auto migrate mysql database err:%v\n", err)
-	// 	panic("auto migrate fail")
-
-	// }
 
 	return client
 

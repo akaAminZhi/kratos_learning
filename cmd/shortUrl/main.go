@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"shortUrl/internal/conf"
+	"shortUrl/third_party/bloom"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"
@@ -73,7 +74,7 @@ func main() {
 	if err := c.Scan(&bc); err != nil {
 		panic(err)
 	}
-
+	bloom.MustInit(bc.Filter)
 	app, cleanup, err := wireApp(bc.Server, bc.Data, logger)
 	if err != nil {
 		panic(err)
