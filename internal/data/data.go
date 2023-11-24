@@ -1,8 +1,10 @@
 package data
 
 import (
+	"context"
 	"fmt"
 	"shortUrl/internal/conf"
+	"shortUrl/third_party/bloom"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/wire"
@@ -25,6 +27,18 @@ type Data struct {
 func NewData(c *conf.Data, logger log.Logger, db *gorm.DB, rdb *redis.Client) (*Data, func(), error) {
 	cleanup := func() {
 		log.NewHelper(logger).Info("closing the data resources")
+	}
+	// pipe := rdb.Pipeline()
+	ctx := context.Background()
+
+	iter := rdb.Scan(ctx, 0, "*", 0).Iterator()
+
+	for iter.Next(ctx) {
+		bloom.GetBloom().Add([]byte(iter.Val()))
+	}
+
+	if err := iter.Err(); err != nil {
+		panic(err)
 	}
 
 	return &Data{mysqlDb: db, rdb: rdb}, cleanup, nil
